@@ -6,4 +6,5 @@
     <string name="add_new_contact">Add new contact</string>
     <string name="action_search">search</string>
     <string name="sign_out">Sign out</string>
+    <string name="text_list_item">text</string>
 </resources>
