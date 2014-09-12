@@ -26,7 +26,8 @@
             android:layout_height="wrap_content"
             android:text="@string/login"
             android:id="@+id/loginButton"
-            android:drawableLeft="@android:drawable/ic_lock_lock" android:paddingLeft="@dimen/login_button_padding"
+            android:drawableLeft="@drawable/login_button"
+            android:paddingLeft="@dimen/login_button_padding"
             android:paddingRight="@dimen/login_button_padding"/>
 </LinearLayout>
 

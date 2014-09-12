@@ -2,7 +2,7 @@
 <resources>
     <dimen name="logo_width">25mm</dimen>
     <dimen name="logo_margin">5mm</dimen>
-    <dimen name="login_button_padding">5mm</dimen>
+    <dimen name="login_button_padding">3mm</dimen>
     <dimen name="inputs_margin">3mm</dimen>
     <dimen name="listview_item_padding">16dp</dimen>
     <dimen name="contact_icon_margin">10dp</dimen>
