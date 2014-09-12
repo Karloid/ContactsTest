@@ -8,22 +8,34 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
             + ("1") + "'";
-    private static final String TAG = "DEBUG_TAG";
+    private static final String[] PROJECTION =
+            new String[]{ContactsContract.Contacts._ID,
+                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
+                    ContactsContract.Contacts.LOOKUP_KEY,
+                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI};
+    private static final int INDEX_CONTACT_ID = 0;
+    private static final int INDEX_DISPLAY_NAME = 1;
+    private static final int INDEX_LOOKUP_KEY = 2;
+    private static final int INDEX_PHOTO_THUMBNAIL = 3;
+
+    private static final String[] DETAIL_PROJECTION =
+            new String[]{ContactsContract.Data.CONTACT_ID,
+                    ContactsContract.Data.DATA1};
+    private static final int INDEX_DETAIL_CONTACT_ID = 0;
+    private static final int INDEX_DETAIL_DATA1 = 1;
+
     private ContactsAdapter adapter;
 
     private static final String SORT_ORDER =
@@ -67,15 +79,15 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
     private void initDetailInfo() {
         ContentResolver cr = getContentResolver();
-        curPhone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
-        curEmail = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
+        curPhone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, DETAIL_PROJECTION,
+                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + ", " + ContactsContract.CommonDataKinds.Phone.DATA1 + " DESC");
+        curEmail = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, DETAIL_PROJECTION,
                 SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
-                null, SELECTION, null, SORT_ORDER);
+                PROJECTION, SELECTION, null, SORT_ORDER);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -156,20 +168,20 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         @Override
         public void bindView(View view, Context context, Cursor cur) {
             final ViewHolder holder = (ViewHolder) view.getTag();
-            String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
-            int contactId = cur.getInt(cur.getColumnIndex(ContactsContract.Contacts._ID));
+            int contactId = cur.getInt(INDEX_CONTACT_ID);
+            String contactName = cur.getString(INDEX_DISPLAY_NAME);
 
             holder.contactName.setText(contactName);
-            holder.phone.setText(getFromDetailCursor(contactId, curPhone, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE));
-            holder.email.setText(getFromDetailCursor(contactId, curEmail, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE));
+            holder.phone.setText(getFromDetailCursor(contactId, curPhone));
+            holder.email.setText(getFromDetailCursor(contactId, curEmail));
 
             final Uri contactUri = ContactsContract.Contacts.getLookupUri(
-                    cur.getLong(cur.getColumnIndex(ContactsContract.Contacts._ID)),
-                    cur.getString(cur.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)));
+                    cur.getLong(INDEX_CONTACT_ID),
+                    cur.getString(INDEX_LOOKUP_KEY));
 
             holder.icon.assignContactUri(contactUri);
 
-            String photoThumbnail = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+            String photoThumbnail = cur.getString(INDEX_PHOTO_THUMBNAIL);
             Bitmap mThumbnail =
                     loadContactPhotoThumbnail(photoThumbnail);
             if (mThumbnail != null) {
@@ -183,19 +195,7 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             AssetFileDescriptor afd = null;
             try {
                 Uri thumbUri;
-                if (Build.VERSION.SDK_INT
-                        >=
-                        Build.VERSION_CODES.HONEYCOMB) {
-                    thumbUri = Uri.parse(photoData);
-                } else {
-                    final Uri contactUri = Uri.withAppendedPath(
-                            ContactsContract.Contacts.CONTENT_URI, photoData);
-
-                    thumbUri =
-                            Uri.withAppendedPath(
-                                    contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-                }
-
+                thumbUri = Uri.parse(photoData);
                 afd = ContactListActivity.this.getContentResolver().
                         openAssetFileDescriptor(thumbUri, "r");
 
@@ -216,16 +216,12 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             return null;
         }
 
-        private String getFromDetailCursor(int contactId, Cursor cursor, String contentItemType) {
+        private String getFromDetailCursor(int contactId, Cursor cursor) {
             cursor.moveToFirst();
-            int id = cursor.getInt(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-            String mimeType = cursor.getString(curPhone.getColumnIndex(ContactsContract.Data.MIMETYPE));
+            int id = cursor.getInt(INDEX_DETAIL_CONTACT_ID);
             boolean cursorEnded = false;
-            boolean idReached = false;
-            while (id != contactId || !mimeType.equals(contentItemType)) {
-                if (id == contactId) {
-                    idReached = true;
-                } else if ((idReached && id != contactId) || id > contactId) {
+            while (id != contactId) {
+                if (id > contactId) {
                     cursorEnded = true;
                     break;
                 }
@@ -233,13 +229,12 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
                     cursorEnded = true;
                     break;
                 }
-                id = cursor.getInt(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                mimeType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
+                id = cursor.getInt(INDEX_DETAIL_CONTACT_ID);
             }
             if (cursorEnded) {
                 return "";
             }
-            return cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DATA1));
+            return cursor.getString(INDEX_DETAIL_DATA1);
         }
 
         private class ViewHolder {
