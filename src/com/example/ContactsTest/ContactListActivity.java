@@ -6,7 +6,6 @@ import android.content.*;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -16,6 +15,8 @@ import java.util.ArrayList;
  * Created by Andrey on 9/11/2014.
  */
 public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
+            + ("1") + "'";
     // This is the Adapter being used to display the list's data
     ContactsAdapter mAdapter;
 
@@ -25,6 +26,7 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
     static final String SORT_ORDER =
             ContactsContract.Contacts.SORT_KEY_PRIMARY;
+    private Cursor curDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +49,22 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         mAdapter = new ContactsAdapter(this);
         setListAdapter(mAdapter);
 
-        // Prepare the loader.  Either re-connect with an existing one,
-        // or start a new one.
+        initDetailInfo();
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void initDetailInfo() {
+        ContentResolver cr = getContentResolver();
+        curDetail = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
     }
 
     // Called when a new Loader needs to be created
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
        /* return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, SORT_ORDER);*/
-        return new CursorLoader(this, ContactsContract.Data.CONTENT_URI,
-                null, ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
-                + ("1") + "'", null, SORT_ORDER);
+        return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
+                null, SELECTION, null, SORT_ORDER);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -108,7 +114,6 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
     private class ContactsAdapter extends CursorAdapter {
         private final LayoutInflater mInflater;
-        private String primaryId = null;
 
         public ContactsAdapter(Context context) {
             super(context, null, 0);
@@ -139,32 +144,13 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
                 Log.i("DEBUG_TEST", str);
             }
             Log.i("DEBUG_TEST", "=====");*/
-            String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-            String curId = cur.getString(cur.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-            if (primaryId == null || !primaryId.equals(curId)) {
-                Log.i("DEBUG_TEST", "contactName: " + contactName + " primaryId: " + primaryId);
-                String phone = "";
-                String email = "";
-                while (cur.moveToNext()) {
-                    String supId = cur.getString(cur.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                    String curContactName = cur.getString(cur.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-                    Log.i("DEBUG_TEST", "contactName: " + curContactName + " curId: " + curId + " supId: " + supId);
-                    if (!supId.equals(curId)) {
-                        //  cur.moveToPrevious();
-                        Log.i("DEBUG_TEST", "BREAK! ===========");
-                        break;
-                    }
-                }
-                //   cur.getString(cur.getColumnIndex(ContactsContract.Data.MIMETYPE))
-                //  cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                primaryId = curId;
+            String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
+            String contactId = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
 
-                holder.contactName.setText(contactName);
-                holder.phone.setText(phone);
-                holder.email.setText(email);
-            } else {
+            holder.contactName.setText(contactName);
+            holder.phone.setText(getPhone(contactId, cur.getPosition()));
+            holder.email.setText("email");
 
-            }
 /*            final ViewHolder holder = (ViewHolder) view.getTag();
 
             // For Android 3.0 and later, gets the thumbnail image Uri from the current Cursor row.
@@ -225,6 +211,33 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             // Loads the thumbnail image pointed to by photoUri into the QuickContactBadge in a
             // background worker thread
             mImageLoader.loadImage(photoUri, holder.icon);*/
+        }
+
+        private String getPhone(String contactId, int position) {
+            curDetail.moveToFirst();
+            int contactIdInt = Integer.valueOf(contactId);
+            int id = curDetail.getInt(curDetail.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+            String mimeType = curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.MIMETYPE));
+            boolean cursorEnded = false;
+            boolean idReached = false;
+            while (id != contactIdInt || !mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
+                if (id == contactIdInt) {
+                    idReached = true;
+                } else if ((idReached && id != contactIdInt) || id > contactIdInt) {
+                    cursorEnded = true;
+                    break;
+                }
+                if (!curDetail.moveToNext()) {
+                    cursorEnded = true;
+                    break;
+                }
+                id = curDetail.getInt(curDetail.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+                mimeType = curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.MIMETYPE));
+            }
+            if (cursorEnded) {
+                return "";
+            }
+            return curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.DATA1));
         }
 
         private class ViewHolder {
