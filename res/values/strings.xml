@@ -7,4 +7,7 @@
     <string name="action_search">search</string>
     <string name="sign_out">Sign out</string>
     <string name="text_list_item">text</string>
+    <string name="imageview_description">Contact avatar</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="delete_contact">Delete</string>
 </resources>

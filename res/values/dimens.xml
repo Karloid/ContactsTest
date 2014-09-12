@@ -6,4 +6,5 @@
     <dimen name="inputs_margin">3mm</dimen>
     <dimen name="listview_item_padding">16dp</dimen>
     <dimen name="contact_icon_margin">10dp</dimen>
+    <dimen name="padding">32dp</dimen>
 </resources>

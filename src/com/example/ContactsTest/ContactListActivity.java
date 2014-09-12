@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
@@ -22,11 +23,12 @@ import java.util.ArrayList;
 /**
  * Created by Andrey on 9/11/2014.
  */
-public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
     public static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
             + ("1") + "'";
+    private static final String TAG = "DEBUG_TAG";
     // This is the Adapter being used to display the list's data
-    ContactsAdapter mAdapter;
+    ContactsAdapter adapter;
 
     // These are the Contacts rows that we will retrieve
     static final String[] PROJECTION = new String[]{
@@ -54,8 +56,9 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
         ArrayList<String> contacts = new ArrayList<String>();
 
-        mAdapter = new ContactsAdapter(this);
-        setListAdapter(mAdapter);
+        adapter = new ContactsAdapter(this);
+        setListAdapter(adapter);
+        getListView().setOnItemClickListener(this);
 
         someLayoutAdjustment();
         initDefaultIcon();
@@ -88,16 +91,16 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
+        adapter.swapCursor(data);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+        adapter.swapCursor(null);
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
+        Log.i(TAG, "onListItemClick!") ;
     }
 
     @Override
@@ -131,6 +134,19 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             startActivity(intent);
         }
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.i(TAG, "onItemClick!") ;
+        Cursor cursor = adapter.getCursor();
+        cursor.moveToPosition(position);
+        Uri uri = ContactsContract.Contacts.getLookupUri(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID)),
+                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)));
+        Intent intent = new Intent(this, ContactDetailActivity.class);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
 
     private class ContactsAdapter extends CursorAdapter {
         private final LayoutInflater mInflater;
@@ -172,9 +188,9 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
             holder.icon.assignContactUri(contactUri);
 
-            String photoThumbail = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+            String photoThumbnail = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
             Bitmap mThumbnail =
-                    loadContactPhotoThumbnail(photoThumbail);
+                    loadContactPhotoThumbnail(photoThumbnail);
             if (mThumbnail != null) {
                 holder.icon.setImageBitmap(mThumbnail);
             } else {
