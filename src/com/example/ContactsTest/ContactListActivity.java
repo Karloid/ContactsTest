@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
 
@@ -58,9 +59,17 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         mAdapter = new ContactsAdapter(this);
         setListAdapter(mAdapter);
 
+        someLayoutAdjustment();
         initDefaultIcon();
         initDetailInfo();
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void someLayoutAdjustment() {
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) getListView()
+                .getLayoutParams();
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+        mlp.setMargins(px, px, px, px);
     }
 
     private void initDefaultIcon() {
