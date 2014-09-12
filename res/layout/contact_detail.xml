@@ -25,9 +25,61 @@
             <LinearLayout
                     android:id="@+id/contact_details_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:paddingBottom="@dimen/padding"
                     android:orientation="vertical">
+                <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/phones_layout">
+                    <TextView
+                            android:id="@+id/contact_detail_phone_header"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:text="@string/phone_header"
+                            style="@style/detailHeader" android:paddingLeft="30dp"/>
+                    <ImageView
+                            xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:src="@android:drawable/divider_horizontal_bright"
+                            android:layout_width="fill_parent"
+                            android:layout_height="6dp"
+                            android:scaleType="fitXY"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:paddingBottom="2dp"
+                            android:paddingTop="2dp" />
+                    <ListView
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:id="@+id/phones_list_view"/>
+                </LinearLayout>
+                <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent" android:id="@+id/emails_layout">
+                    <TextView
+                            android:id="@+id/contact_detail_email_header"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:text="@string/email_header"
+                            style="@style/detailHeader" android:paddingLeft="30dp"/>
+                    <ImageView
+                            xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:src="@android:drawable/divider_horizontal_bright"
+                            android:layout_width="fill_parent"
+                            android:layout_height="6dp"
+                            android:scaleType="fitXY"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:paddingBottom="2dp"
+                            android:paddingTop="2dp" />
+                    <ListView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/emails_list_view"/>
+                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>

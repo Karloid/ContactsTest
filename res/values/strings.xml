@@ -10,4 +10,6 @@
     <string name="imageview_description">Contact avatar</string>
     <string name="action_favorite">Favorite</string>
     <string name="delete_contact">Delete</string>
+    <string name="phone_header">Phone</string>
+    <string name="email_header">Email</string>
 </resources>

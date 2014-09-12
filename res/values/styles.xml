@@ -12,4 +12,8 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <style name="detailHeader" parent="@android:style/TextAppearance.Medium">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
 </resources>
