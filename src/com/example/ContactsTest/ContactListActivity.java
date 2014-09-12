@@ -3,12 +3,19 @@ package com.example.ContactsTest;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.*;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.*;
 import android.widget.*;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +33,9 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
     static final String SORT_ORDER =
             ContactsContract.Contacts.SORT_KEY_PRIMARY;
-    private Cursor curDetail;
+    private Cursor curPhone;
+    private Cursor curEmail;
+    private Bitmap defaultIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +58,20 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         mAdapter = new ContactsAdapter(this);
         setListAdapter(mAdapter);
 
+        initDefaultIcon();
         initDetailInfo();
         getLoaderManager().initLoader(0, null, this);
     }
 
+    private void initDefaultIcon() {
+        defaultIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture_holo_light);
+    }
+
     private void initDetailInfo() {
         ContentResolver cr = getContentResolver();
-        curDetail = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+        curPhone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
+        curEmail = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
                 SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
     }
 
@@ -145,99 +161,132 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             }
             Log.i("DEBUG_TEST", "=====");*/
             String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
-            String contactId = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+            int contactId = cur.getInt(cur.getColumnIndex(ContactsContract.Contacts._ID));
 
             holder.contactName.setText(contactName);
-            holder.phone.setText(getPhone(contactId, cur.getPosition()));
-            holder.email.setText("email");
+            holder.phone.setText(getFromDetailCursor(contactId, curPhone, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE));
+            holder.email.setText(getFromDetailCursor(contactId, curEmail, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE));
 
-/*            final ViewHolder holder = (ViewHolder) view.getTag();
-
-            // For Android 3.0 and later, gets the thumbnail image Uri from the current Cursor row.
-            // For platforms earlier than 3.0, this isn't necessary, because the thumbnail is
-            // generated from the other fields in the row.
-            final String photoUri = cur.getString(ContactsQuery.PHOTO_THUMBNAIL_DATA);
-
-            final String displayName = cur.getString(ContactsQuery.DISPLAY_NAME);
-
-            final int startIndex = indexOfSearchQuery(displayName);
-
-            if (startIndex == -1) {
-                // If the user didn't do a search, or the search string didn't match a display
-                // name, show the display name without highlighting
-                holder.text1.setText(displayName);
-
-                if (TextUtils.isEmpty(mSearchTerm)) {
-                    // If the search search is empty, hide the second line of text
-                    holder.text2.setVisibility(View.GONE);
-                } else {
-                    // Shows a second line of text that indicates the search string matched
-                    // something other than the display name
-                    holder.text2.setVisibility(View.VISIBLE);
-                }
-            } else {
-                // If the search string matched the display name, applies a SpannableString to
-                // highlight the search string with the displayed display name
-
-                // Wraps the display name in the SpannableString
-                final SpannableString highlightedName = new SpannableString(displayName);
-
-                // Sets the span to start at the starting point of the match and end at "length"
-                // characters beyond the starting point
-                highlightedName.setSpan(highlightTextSpan, startIndex,
-                        startIndex + mSearchTerm.length(), 0);
-
-                // Binds the SpannableString to the display name View object
-                holder.text1.setText(highlightedName);
-
-                // Since the search string matched the name, this hides the secondary message
-                holder.text2.setVisibility(View.GONE);
-            }
-
-            // Processes the QuickContactBadge. A QuickContactBadge first appears as a contact's
-            // thumbnail image with styling that indicates it can be touched for additional
-            // information. When the user clicks the image, the badge expands into a dialog box
-            // containing the contact's details and icons for the built-in apps that can handle
-            // each detail type.
-
-            // Generates the contact lookup Uri
             final Uri contactUri = ContactsContract.Contacts.getLookupUri(
-                    cur.getLong(ContactsQuery.ID),
-                    cur.getString(ContactsQuery.LOOKUP_KEY));
+                    cur.getLong(cur.getColumnIndex(ContactsContract.Contacts._ID)),
+                    cur.getString(cur.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)));
 
             // Binds the contact's lookup Uri to the QuickContactBadge
             holder.icon.assignContactUri(contactUri);
 
             // Loads the thumbnail image pointed to by photoUri into the QuickContactBadge in a
             // background worker thread
-            mImageLoader.loadImage(photoUri, holder.icon);*/
+            String photoThumbail = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
+            Bitmap mThumbnail =
+                    loadContactPhotoThumbnail(photoThumbail);
+            if (mThumbnail != null) {
+                holder.icon.setImageBitmap(mThumbnail);
+            } else {
+                holder.icon.setImageBitmap(defaultIcon);
+            }
         }
 
-        private String getPhone(String contactId, int position) {
-            curDetail.moveToFirst();
-            int contactIdInt = Integer.valueOf(contactId);
-            int id = curDetail.getInt(curDetail.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-            String mimeType = curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.MIMETYPE));
+        /**
+         * Load a contact photo thumbnail and return it as a Bitmap,
+         * resizing the image to the provided image dimensions as needed.
+         *
+         * @param photoData photo ID Prior to Honeycomb, the contact's _ID value.
+         *                  For Honeycomb and later, the value of PHOTO_THUMBNAIL_URI.
+         * @return A thumbnail Bitmap, sized to the provided width and height.
+         * Returns null if the thumbnail is not found.
+         */
+        private Bitmap loadContactPhotoThumbnail(String photoData) {
+            // Creates an asset file descriptor for the thumbnail file.
+            AssetFileDescriptor afd = null;
+            // try-catch block for file not found
+            try {
+                // Creates a holder for the URI.
+                Uri thumbUri;
+                // If Android 3.0 or later
+                if (Build.VERSION.SDK_INT
+                        >=
+                        Build.VERSION_CODES.HONEYCOMB) {
+                    // Sets the URI from the incoming PHOTO_THUMBNAIL_URI
+                    thumbUri = Uri.parse(photoData);
+                } else {
+                    // Prior to Android 3.0, constructs a photo Uri using _ID
+                /*
+                 * Creates a contact URI from the Contacts content URI
+                 * incoming photoData (_ID)
+                 */
+                    final Uri contactUri = Uri.withAppendedPath(
+                            ContactsContract.Contacts.CONTENT_URI, photoData);
+                /*
+                 * Creates a photo URI by appending the content URI of
+                 * Contacts.Photo.
+                 */
+                    thumbUri =
+                            Uri.withAppendedPath(
+                                    contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+                }
+
+        /*
+         * Retrieves an AssetFileDescriptor object for the thumbnail
+         * URI
+         * using ContentResolver.openAssetFileDescriptor
+         */
+
+                afd = ContactListActivity.this.getContentResolver().
+                        openAssetFileDescriptor(thumbUri, "r");
+
+        /*
+         * Gets a file descriptor from the asset file descriptor.
+         * This object can be used across processes.
+         */
+                FileDescriptor fileDescriptor = afd.getFileDescriptor();
+                // Decode the photo file and return the result as a Bitmap
+                // If the file descriptor is valid
+                if (fileDescriptor != null) {
+                    // Decodes the bitmap
+                    return BitmapFactory.decodeFileDescriptor(
+                            fileDescriptor, null, null);
+                }
+                // If the file isn't found
+            } catch (Exception e) {
+            /*
+             * Handle file not found errors
+             */
+                // In all cases, close the asset file descriptor
+            } finally {
+                if (afd != null) {
+                    try {
+                        afd.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+            return null;
+        }
+
+        private String getFromDetailCursor(int contactId, Cursor cursor, String contentItemType) {
+            cursor.moveToFirst();
+            int id = cursor.getInt(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+            String mimeType = cursor.getString(curPhone.getColumnIndex(ContactsContract.Data.MIMETYPE));
             boolean cursorEnded = false;
             boolean idReached = false;
-            while (id != contactIdInt || !mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
-                if (id == contactIdInt) {
+            while (id != contactId || !mimeType.equals(contentItemType)) {
+                if (id == contactId) {
                     idReached = true;
-                } else if ((idReached && id != contactIdInt) || id > contactIdInt) {
+                } else if ((idReached && id != contactId) || id > contactId) {
                     cursorEnded = true;
                     break;
                 }
-                if (!curDetail.moveToNext()) {
+                if (!cursor.moveToNext()) {
                     cursorEnded = true;
                     break;
                 }
-                id = curDetail.getInt(curDetail.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                mimeType = curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.MIMETYPE));
+                id = cursor.getInt(cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+                mimeType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
             }
             if (cursorEnded) {
                 return "";
             }
-            return curDetail.getString(curDetail.getColumnIndex(ContactsContract.Data.DATA1));
+            return cursor.getString(cursor.getColumnIndex(ContactsContract.Data.DATA1));
         }
 
         private class ViewHolder {
