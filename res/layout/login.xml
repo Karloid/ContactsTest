@@ -5,22 +5,30 @@
               android:layout_height="fill_parent"
               android:gravity="center_vertical|center_horizontal">
     <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView" android:src="@drawable/logo" android:minWidth="@dimen/logo_width"
-            android:minHeight="@dimen/logo_width" android:layout_marginBottom="@dimen/logo_margin"/>
+            android:layout_width="@dimen/logo_width"
+            android:layout_height="@dimen/logo_width"
+            android:id="@+id/imageView"
+            android:src="@drawable/logo_big"
+            android:layout_marginBottom="@dimen/logo_margin"
+            android:scaleType="fitCenter"/>
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/inputs_width"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
             android:ems="10"
-            android:id="@+id/editText" android:layout_marginBottom="@dimen/inputs_margin"/>
+            android:background="@drawable/border_ui"
+            android:padding="@dimen/padding_input_edit"
+            android:hint="Username"
+            android:id="@+id/username_edit" android:layout_marginBottom="@dimen/inputs_margin"/>
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/inputs_width"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
-            android:id="@+id/editText2" android:layout_marginBottom="@dimen/inputs_margin"/>
+            android:background="@drawable/border_ui"
+            android:padding="@dimen/padding_input_edit"
+            android:hint="Password"
+            android:id="@+id/password_edit" android:layout_marginBottom="@dimen/inputs_margin"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
