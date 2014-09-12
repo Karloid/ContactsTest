@@ -7,4 +7,7 @@
     <dimen name="listview_item_padding">16dp</dimen>
     <dimen name="contact_icon_margin">10dp</dimen>
     <dimen name="padding">32dp</dimen>
+    <dimen name="contact_photo_height">300dp</dimen>
+    <dimen name="value_label_padding">10dp</dimen>
+    <dimen name="listview_item_padding_half">8dp</dimen>
 </resources>

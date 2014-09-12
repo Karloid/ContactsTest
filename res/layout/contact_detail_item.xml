@@ -3,16 +3,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:paddingLeft="@dimen/listview_item_padding"
+              android:paddingRight="@dimen/listview_item_padding"
+              android:paddingBottom="@dimen/listview_item_padding"
+        >
 
     <TextView
+            style="@style/contactNameTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Value"
+            android:textSize="16sp"
             android:id="@+id/contact_detail_value" android:singleLine="false"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Label"
-            android:id="@+id/contact_detail_label"/>
+            android:textSize="12sp"
+            android:id="@+id/contact_detail_label"
+            android:paddingLeft="@dimen/value_label_padding"/>
 </LinearLayout>

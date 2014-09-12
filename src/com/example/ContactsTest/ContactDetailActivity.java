@@ -13,7 +13,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
@@ -46,6 +45,7 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
     private LinearLayout emailsLayout;
     private ListView phonesListView;
     private ListView emailsListView;
+    private LinearLayout linearLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +58,11 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
 
     private void init() {
         phones = new ArrayList<DetailValue>();
-        phonesLayout = (LinearLayout) findViewById(R.id.phones_layout);
+       /* phonesLayout = (LinearLayout) findViewById(R.id.phones_layout);
         emailsLayout = (LinearLayout) findViewById(R.id.emails_layout);
         phonesListView = (ListView) findViewById(R.id.phones_list_view);
-        emailsListView = (ListView) findViewById(R.id.emails_list_view);
+        emailsListView = (ListView) findViewById(R.id.emails_list_view);*/
+        linearLayout = (LinearLayout) findViewById(R.id.contact_detail_layout);
         emails = new ArrayList<DetailValue>();
         contactPhoto = (ImageView) findViewById(R.id.contact_photo);
         getActionBar().setIcon(new ColorDrawable(getResources().getColor(android.R.color.transparent)));
@@ -99,17 +100,25 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
                 emails.add(new DetailValue(value, typeLabel));
             }
         } while (data.moveToNext());
-        for (DetailValue phone : phones) {
-            Log.i(TAG, "" + phone);
-        }
-        for (DetailValue email : emails) {
-            Log.i(TAG, "" + email);
-        }
+        LayoutInflater inflater = getLayoutInflater();
+        linearLayout.removeAllViews();
         if (!phones.isEmpty()) {
-            phonesLayout.setVisibility(View.VISIBLE);
-            phonesListView.setAdapter(new DetailArrayAdapter(this, R.layout.contact_detail_item, phones));
-        } else {
-            phonesLayout.setVisibility(View.INVISIBLE);
+            createViewsForDetailValues(inflater, getString(R.string.phone_header), phones, linearLayout);
+        }
+        if (!emails.isEmpty()) {
+            createViewsForDetailValues(inflater, getString(R.string.email_header), emails, linearLayout);
+        }
+    }
+
+    private void createViewsForDetailValues(LayoutInflater inflater, String headerStr, List<DetailValue> detailValues, LinearLayout layout) {
+        View header = inflater.inflate(R.layout.contact_detail_header, null);
+        ((TextView)header.findViewById(R.id.contact_detail_header)).setText(headerStr);
+        layout.addView(header);
+        for (DetailValue detailValue : detailValues) {
+            View view = inflater.inflate(R.layout.contact_detail_item, null);
+            ((TextView)view.findViewById(R.id.contact_detail_value)).setText(detailValue.value);
+            ((TextView)view.findViewById(R.id.contact_detail_label)).setText(detailValue.label);
+            layout.addView(view);
         }
     }
 
@@ -184,45 +193,6 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
                     "value='" + value + '\'' +
                     ", label='" + label + '\'' +
                     '}';
-        }
-    }
-
-    private class DetailArrayAdapter extends ArrayAdapter<DetailValue> {
-        private final List<DetailValue> values;
-        private final ContactDetailActivity context;
-        private final int layoutId;
-        private final LayoutInflater inflater;
-
-        public DetailArrayAdapter(ContactDetailActivity context, int layoutId, List<DetailValue> values) {
-            super(context, layoutId, values);
-            this.layoutId = layoutId;
-            this.context = context;
-            this.values = values;
-            this.inflater = context.getLayoutInflater();
-
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            ViewHolder holder;
-            if (view == null) {
-                view = inflater.inflate(layoutId, parent, false);
-                holder = new ViewHolder();
-                holder.value = (TextView)view.findViewById(R.id.contact_detail_value);
-                holder.label = (TextView)view.findViewById(R.id.contact_detail_label);
-                view.setTag(holder);
-            } else {
-                holder = (ViewHolder) view.getTag();
-            }
-            DetailValue detailValue = values.get(position);
-            holder.value.setText(detailValue.value);
-            holder.label.setText(detailValue.label);
-            return view;
-        }
-
-        private class ViewHolder {
-            public TextView value;
-            public TextView label;
         }
     }
 }
