@@ -30,21 +30,16 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
                     ContactsContract.Data.DATA2,
                     ContactsContract.Data.DATA3};
     private static final String SELECTION = null;
-    public static final int INDEX_DISPLAY_NAME = 0;
+    private static final int INDEX_DISPLAY_NAME = 0;
     private static final int INDEX_CONTACT_ID = 1;
     private static final int INDEX_MIMETYPE = 2;
     private static final int INDEX_VALUE = 3;
     private static final int INDEX_LABEL = 4;
     private static final int INDEX_CUSTOM_LABEL = 5;
-    private static final String TAG = "detail_debug";
     private Uri uriContact;
     private ImageView contactPhoto;
     private List<DetailValue> phones;
     private List<DetailValue> emails;
-    private LinearLayout phonesLayout;
-    private LinearLayout emailsLayout;
-    private ListView phonesListView;
-    private ListView emailsListView;
     private LinearLayout linearLayout;
 
     @Override
@@ -137,7 +132,7 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
 
     }
 
-    public Bitmap getLargePhoto(long contactId) {
+    Bitmap getLargePhoto(long contactId) {
         Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
         Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
         try {
@@ -149,7 +144,7 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
         }
     }
 
-    public Bitmap getThumbnailPhoto(long contactId) {
+    Bitmap getThumbnailPhoto(long contactId) {
         Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
         Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
         Cursor cursor = getContentResolver().query(photoUri,

@@ -14,8 +14,8 @@
 
     <TextView android:id="@+id/contact_name"
               style="@style/contactNameTitle"
-              android:paddingLeft="@dimen/listview_item_padding"
-              android:paddingRight="@dimen/listview_item_padding"
+              android:paddingLeft="@dimen/list_view_item_padding"
+              android:paddingRight="@dimen/list_view_item_padding"
               android:layout_width="match_parent"
               android:layout_height="26dp"
               android:layout_toRightOf="@android:id/icon"
@@ -30,8 +30,8 @@
               android:textAppearance="?android:attr/textAppearanceLarge"/>
     <TextView android:id="@+id/phone"
               style="@style/contactPhoneEmail"
-              android:paddingLeft="@dimen/listview_item_padding"
-              android:paddingRight="@dimen/listview_item_padding"
+              android:paddingLeft="@dimen/list_view_item_padding"
+              android:paddingRight="@dimen/list_view_item_padding"
               android:layout_width="match_parent"
               android:layout_height="16dp"
               android:layout_below="@id/contact_name"
@@ -44,8 +44,8 @@
               android:textAppearance="?android:attr/textAppearanceLarge"/>
     <TextView android:id="@+id/email"
               style="@style/contactPhoneEmail"
-              android:paddingLeft="@dimen/listview_item_padding"
-              android:paddingRight="@dimen/listview_item_padding"
+              android:paddingLeft="@dimen/list_view_item_padding"
+              android:paddingRight="@dimen/list_view_item_padding"
               android:layout_width="match_parent"
               android:layout_height="16dp"
               android:layout_below="@id/phone"

@@ -9,9 +9,6 @@ import android.view.View;
 public class LoginActivity extends Activity {
     private View loginButton;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +29,6 @@ public class LoginActivity extends Activity {
 
     private void tryLogin() {
         startContactListActivity();
-
     }
 
     private void startContactListActivity() {

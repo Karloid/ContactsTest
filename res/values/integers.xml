@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <integer name="contact_detail_photo_percent">35</integer>
-    <integer name="contact_detail_info_percent">65</integer>
-</resources>

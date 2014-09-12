@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ContactsTest</string>
-    <string name="username">Username</string>
     <string name="login">Login</string>
     <string name="add_new_contact">Add new contact</string>
     <string name="action_search">search</string>
     <string name="sign_out">Sign out</string>
-    <string name="text_list_item">text</string>
-    <string name="imageview_description">Contact avatar</string>
+    <string name="image_view_description">Contact avatar</string>
     <string name="action_favorite">Favorite</string>
     <string name="delete_contact">Delete</string>
     <string name="phone_header">Phone</string>
     <string name="email_header">Email</string>
+    <string name="logo_content_description">Logo description</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
 </resources>

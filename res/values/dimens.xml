@@ -4,12 +4,9 @@
     <dimen name="logo_margin">30dp</dimen>
     <dimen name="login_button_padding">20dp</dimen>
     <dimen name="inputs_margin">20dp</dimen>
-    <dimen name="listview_item_padding">16dp</dimen>
+    <dimen name="list_view_item_padding">16dp</dimen>
     <dimen name="contact_icon_margin">10dp</dimen>
-    <dimen name="padding">32dp</dimen>
-    <dimen name="contact_photo_height">300dp</dimen>
     <dimen name="value_label_padding">10dp</dimen>
-    <dimen name="listview_item_padding_half">8dp</dimen>
     <dimen name="padding_input_edit">5dp</dimen>
     <dimen name="inputs_width">200dp</dimen>
 </resources>

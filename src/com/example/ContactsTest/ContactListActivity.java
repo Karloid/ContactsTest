@@ -20,19 +20,13 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by Andrey on 9/11/2014.
- */
-public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
-    public static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
+public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
             + ("1") + "'";
     private static final String TAG = "DEBUG_TAG";
-    ContactsAdapter adapter;
+    private ContactsAdapter adapter;
 
-    static final String[] PROJECTION = new String[]{
-            ContactsContract.Data.DISPLAY_NAME, ContactsContract.Data.CONTACT_ID};
-
-    static final String SORT_ORDER =
+    private static final String SORT_ORDER =
             ContactsContract.Contacts.SORT_KEY_PRIMARY;
     private Cursor curPhone;
     private Cursor curEmail;
@@ -51,12 +45,8 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
         root.addView(progressBar);
 
-
-        ArrayList<String> contacts = new ArrayList<String>();
-
         adapter = new ContactsAdapter(this);
         setListAdapter(adapter);
-        getListView().setOnItemClickListener(this);
 
         someLayoutAdjustment();
         initDefaultIcon();
@@ -129,8 +119,7 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(TAG, "onItemClick!") ;
+    protected void onListItemClick(ListView l, View v, int position, long id) {
         Cursor cursor = adapter.getCursor();
         cursor.moveToPosition(position);
         Uri uri = ContactsContract.Contacts.getLookupUri(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID)),
@@ -139,7 +128,6 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
         intent.setData(uri);
         startActivity(intent);
     }
-
 
     private class ContactsAdapter extends CursorAdapter {
         private final LayoutInflater mInflater;
@@ -260,7 +248,5 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             QuickContactBadge icon;
             public TextView email;
         }
-
-
     }
 }

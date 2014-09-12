@@ -7,14 +7,14 @@
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="wrap_content">
         <ImageView
                 android:id="@+id/contact_photo"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_contact_picture_180_holo_light"
-                android:contentDescription="@string/imageview_description"/>
+                android:contentDescription="@string/image_view_description"/>
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"

@@ -10,6 +10,7 @@
             android:id="@+id/imageView"
             android:src="@drawable/logo_big"
             android:layout_marginBottom="@dimen/logo_margin"
+            android:contentDescription="@string/logo_content_description"
             android:scaleType="fitCenter"/>
     <EditText
             android:layout_width="@dimen/inputs_width"
@@ -18,7 +19,7 @@
             android:ems="10"
             android:background="@drawable/border_ui"
             android:padding="@dimen/padding_input_edit"
-            android:hint="Username"
+            android:hint="@string/hint_username"
             android:id="@+id/username_edit" android:layout_marginBottom="@dimen/inputs_margin"/>
     <EditText
             android:layout_width="@dimen/inputs_width"
@@ -27,7 +28,7 @@
             android:ems="10"
             android:background="@drawable/border_ui"
             android:padding="@dimen/padding_input_edit"
-            android:hint="Password"
+            android:hint="@string/hint_password"
             android:id="@+id/password_edit" android:layout_marginBottom="@dimen/inputs_margin"/>
     <Button
             android:layout_width="wrap_content"
