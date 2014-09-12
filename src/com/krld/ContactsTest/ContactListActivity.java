@@ -1,4 +1,4 @@
-package com.example.ContactsTest;
+package com.krld.ContactsTest;
 
 import android.app.ListActivity;
 import android.app.LoaderManager;
@@ -8,11 +8,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
+import com.example.ContactsTest.R;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -142,17 +144,17 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     }
 
     private class ContactsAdapter extends CursorAdapter {
-        private final LayoutInflater mInflater;
+        private final LayoutInflater inflater;
 
         public ContactsAdapter(Context context) {
             super(context, null, 0);
-            mInflater = LayoutInflater.from(context);
+            inflater = LayoutInflater.from(context);
         }
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
             final View itemLayout =
-                    mInflater.inflate(R.layout.contact_list_item, viewGroup, false);
+                    inflater.inflate(R.layout.contact_list_item, viewGroup, false);
 
             final ViewHolder holder = new ViewHolder();
             holder.contactName = (TextView) itemLayout.findViewById(R.id.contact_name);
@@ -182,13 +184,8 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             holder.icon.assignContactUri(contactUri);
 
             String photoThumbnail = cur.getString(INDEX_PHOTO_THUMBNAIL);
-            Bitmap mThumbnail =
-                    loadContactPhotoThumbnail(photoThumbnail);
-            if (mThumbnail != null) {
-                holder.icon.setImageBitmap(mThumbnail);
-            } else {
-                holder.icon.setImageBitmap(defaultIcon);
-            }
+            holder.icon.setImageBitmap(defaultIcon);
+            new AsyncTaskDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[]{holder.icon, photoThumbnail});
         }
 
         private Bitmap loadContactPhotoThumbnail(String photoData) {
@@ -242,6 +239,26 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             TextView phone;
             QuickContactBadge icon;
             public TextView email;
+        }
+
+        private class AsyncTaskDownloader extends AsyncTask<Object, Void, Object> {
+
+            @Override
+            protected Object doInBackground(Object... params) {
+                Bitmap mThumbnail =
+                        loadContactPhotoThumbnail((String) params[1]);
+                return new Object[]{params[0], mThumbnail};
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                Object[] array = (Object[]) o;
+                QuickContactBadge icon = (QuickContactBadge) array[0];
+                Bitmap thumbnailBitmap = (Bitmap) array[1];
+                if (thumbnailBitmap != null) {
+                    icon.setImageBitmap(thumbnailBitmap);
+                }
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.ContactsTest;
+package com.krld.ContactsTest;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.*;
 import android.widget.*;
+import com.example.ContactsTest.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,10 +54,6 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
 
     private void init() {
         phones = new ArrayList<DetailValue>();
-       /* phonesLayout = (LinearLayout) findViewById(R.id.phones_layout);
-        emailsLayout = (LinearLayout) findViewById(R.id.emails_layout);
-        phonesListView = (ListView) findViewById(R.id.phones_list_view);
-        emailsListView = (ListView) findViewById(R.id.emails_list_view);*/
         linearLayout = (LinearLayout) findViewById(R.id.contact_detail_layout);
         emails = new ArrayList<DetailValue>();
         contactPhoto = (ImageView) findViewById(R.id.contact_photo);
@@ -180,14 +177,6 @@ public class ContactDetailActivity extends Activity implements LoaderManager.Loa
             this.value = value;
             this.label = label;
 
-        }
-
-        @Override
-        public String toString() {
-            return "DetailValue{" +
-                    "value='" + value + '\'' +
-                    ", label='" + label + '\'' +
-                    '}';
         }
     }
 }

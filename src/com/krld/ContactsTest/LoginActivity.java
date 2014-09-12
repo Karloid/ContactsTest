@@ -1,10 +1,11 @@
-package com.example.ContactsTest;
+package com.krld.ContactsTest;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import com.example.ContactsTest.R;
 
 public class LoginActivity extends Activity {
     private View loginButton;
