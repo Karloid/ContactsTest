@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="logo_width">130dp</dimen>
-    <dimen name="logo_margin">5mm</dimen>
-    <dimen name="login_button_padding">3mm</dimen>
-    <dimen name="inputs_margin">3mm</dimen>
+    <dimen name="logo_margin">30dp</dimen>
+    <dimen name="login_button_padding">20dp</dimen>
+    <dimen name="inputs_margin">20dp</dimen>
     <dimen name="listview_item_padding">16dp</dimen>
     <dimen name="contact_icon_margin">10dp</dimen>
     <dimen name="padding">32dp</dimen>

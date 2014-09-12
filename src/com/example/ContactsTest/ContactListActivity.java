@@ -27,7 +27,6 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     public static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
             + ("1") + "'";
     private static final String TAG = "DEBUG_TAG";
-    // This is the Adapter being used to display the list's data
     ContactsAdapter adapter;
 
     static final String[] PROJECTION = new String[]{
