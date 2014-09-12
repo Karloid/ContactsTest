@@ -30,7 +30,6 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     // This is the Adapter being used to display the list's data
     ContactsAdapter adapter;
 
-    // These are the Contacts rows that we will retrieve
     static final String[] PROJECTION = new String[]{
             ContactsContract.Data.DISPLAY_NAME, ContactsContract.Data.CONTACT_ID};
 
@@ -96,11 +95,6 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        Log.i(TAG, "onListItemClick!") ;
     }
 
     @Override
