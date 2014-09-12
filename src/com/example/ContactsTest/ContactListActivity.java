@@ -42,14 +42,12 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Create a progress bar to display while the list loads
         ProgressBar progressBar = new ProgressBar(this);
         progressBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         progressBar.setIndeterminate(true);
         getListView().setEmptyView(progressBar);
 
-        // Must add the progress bar to the root of the layout
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
         root.addView(progressBar);
 
@@ -84,10 +82,7 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
                 SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
     }
 
-    // Called when a new Loader needs to be created
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-       /* return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, SORT_ORDER);*/
         return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
                 null, SELECTION, null, SORT_ORDER);
     }
@@ -163,12 +158,7 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
 
         @Override
         public void bindView(View view, Context context, Cursor cur) {
-            // Gets handles to individual view resources
             final ViewHolder holder = (ViewHolder) view.getTag();
-   /*          for (String str : cur.getColumnNames()) {
-                Log.i("DEBUG_TEST", str);
-            }
-            Log.i("DEBUG_TEST", "=====");*/
             String contactName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
             int contactId = cur.getInt(cur.getColumnIndex(ContactsContract.Contacts._ID));
 
@@ -180,11 +170,8 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
                     cur.getLong(cur.getColumnIndex(ContactsContract.Contacts._ID)),
                     cur.getString(cur.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)));
 
-            // Binds the contact's lookup Uri to the QuickContactBadge
             holder.icon.assignContactUri(contactUri);
 
-            // Loads the thumbnail image pointed to by photoUri into the QuickContactBadge in a
-            // background worker thread
             String photoThumbail = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
             Bitmap mThumbnail =
                     loadContactPhotoThumbnail(photoThumbail);
@@ -195,72 +182,32 @@ public class ContactListActivity extends ListActivity implements LoaderManager.L
             }
         }
 
-        /**
-         * Load a contact photo thumbnail and return it as a Bitmap,
-         * resizing the image to the provided image dimensions as needed.
-         *
-         * @param photoData photo ID Prior to Honeycomb, the contact's _ID value.
-         *                  For Honeycomb and later, the value of PHOTO_THUMBNAIL_URI.
-         * @return A thumbnail Bitmap, sized to the provided width and height.
-         * Returns null if the thumbnail is not found.
-         */
         private Bitmap loadContactPhotoThumbnail(String photoData) {
-            // Creates an asset file descriptor for the thumbnail file.
             AssetFileDescriptor afd = null;
-            // try-catch block for file not found
             try {
-                // Creates a holder for the URI.
                 Uri thumbUri;
-                // If Android 3.0 or later
                 if (Build.VERSION.SDK_INT
                         >=
                         Build.VERSION_CODES.HONEYCOMB) {
-                    // Sets the URI from the incoming PHOTO_THUMBNAIL_URI
                     thumbUri = Uri.parse(photoData);
                 } else {
-                    // Prior to Android 3.0, constructs a photo Uri using _ID
-                /*
-                 * Creates a contact URI from the Contacts content URI
-                 * incoming photoData (_ID)
-                 */
                     final Uri contactUri = Uri.withAppendedPath(
                             ContactsContract.Contacts.CONTENT_URI, photoData);
-                /*
-                 * Creates a photo URI by appending the content URI of
-                 * Contacts.Photo.
-                 */
+
                     thumbUri =
                             Uri.withAppendedPath(
                                     contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
                 }
 
-        /*
-         * Retrieves an AssetFileDescriptor object for the thumbnail
-         * URI
-         * using ContentResolver.openAssetFileDescriptor
-         */
-
                 afd = ContactListActivity.this.getContentResolver().
                         openAssetFileDescriptor(thumbUri, "r");
 
-        /*
-         * Gets a file descriptor from the asset file descriptor.
-         * This object can be used across processes.
-         */
                 FileDescriptor fileDescriptor = afd.getFileDescriptor();
-                // Decode the photo file and return the result as a Bitmap
-                // If the file descriptor is valid
                 if (fileDescriptor != null) {
-                    // Decodes the bitmap
                     return BitmapFactory.decodeFileDescriptor(
                             fileDescriptor, null, null);
                 }
-                // If the file isn't found
             } catch (Exception e) {
-            /*
-             * Handle file not found errors
-             */
-                // In all cases, close the asset file descriptor
             } finally {
                 if (afd != null) {
                     try {
