@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.*;
 import android.widget.*;
-import com.example.ContactsTest.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

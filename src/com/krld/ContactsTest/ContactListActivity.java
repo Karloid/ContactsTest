@@ -14,7 +14,6 @@ import android.provider.ContactsContract;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
-import com.example.ContactsTest.R;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
