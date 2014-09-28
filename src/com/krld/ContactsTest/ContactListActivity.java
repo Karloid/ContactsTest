@@ -1,263 +1,44 @@
 package com.krld.ContactsTest;
 
-import android.app.ListActivity;
-import android.app.LoaderManager;
-import android.content.*;
-import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.TypedValue;
-import android.view.*;
-import android.widget.*;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-
-public class ContactListActivity extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String SELECTION = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
-            + ("1") + "'";
-    private static final String[] PROJECTION =
-            new String[]{ContactsContract.Contacts._ID,
-                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY,
-                    ContactsContract.Contacts.LOOKUP_KEY,
-                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI};
-    private static final int INDEX_CONTACT_ID = 0;
-    private static final int INDEX_DISPLAY_NAME = 1;
-    private static final int INDEX_LOOKUP_KEY = 2;
-    private static final int INDEX_PHOTO_THUMBNAIL = 3;
-
-    private static final String[] DETAIL_PROJECTION =
-            new String[]{ContactsContract.Data.CONTACT_ID,
-                    ContactsContract.Data.DATA1};
-    private static final int INDEX_DETAIL_CONTACT_ID = 0;
-    private static final int INDEX_DETAIL_DATA1 = 1;
-
-    private ContactsAdapter adapter;
-
-    private static final String SORT_ORDER =
-            ContactsContract.Contacts.SORT_KEY_PRIMARY;
-    private Cursor curPhone;
-    private Cursor curEmail;
-    private Bitmap defaultIcon;
-
+/**
+ * Created by Andrey on 9/28/2014.
+ */
+public class ContactListActivity extends SingleFragmentActivity implements ContactListFragment.Callbacks {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        ProgressBar progressBar = new ProgressBar(this);
-        progressBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        progressBar.setIndeterminate(true);
-        getListView().setEmptyView(progressBar);
-
-        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        root.addView(progressBar);
-
-        adapter = new ContactsAdapter(this);
-        setListAdapter(adapter);
-
-        someLayoutAdjustment();
-        initDefaultIcon();
-        initDetailInfo();
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private void someLayoutAdjustment() {
-        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) getListView()
-                .getLayoutParams();
-        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
-        mlp.setMargins(px, px, px, px);
-    }
-
-    private void initDefaultIcon() {
-        defaultIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_contact_picture_holo_light);
-    }
-
-    private void initDetailInfo() {
-        ContentResolver cr = getContentResolver();
-        curPhone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, DETAIL_PROJECTION,
-                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + ", " + ContactsContract.CommonDataKinds.Phone.DATA1 + " DESC");
-        curEmail = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, DETAIL_PROJECTION,
-                SELECTION, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
-    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, ContactsContract.Contacts.CONTENT_URI,
-                PROJECTION, SELECTION, null, SORT_ORDER);
-    }
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+    protected Fragment createFragment() {
+        return new ContactListFragment();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.contact_list_actions, menu);
-        return super.onCreateOptionsMenu(menu);
+    protected int getLayoutResourceId() {
+        return R.layout.activity_masterdetail;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_new_contact:
-                addNewContact();
-                return true;
-            case R.id.sign_out:
-                returnToLogin();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void returnToLogin() {
-        finish();
-    }
-
-    private void addNewContact() {
-        Intent intent = new Intent(Intent.ACTION_INSERT);
-        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
+    public void onContactSelected(Uri uri) {
+        if (findViewById(R.id.detailFragmentContainer) == null) {
+            Intent intent = new Intent(this, ContactDetailActivity.class);
+            intent.setData(uri);
             startActivity(intent);
-        }
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Cursor cursor = adapter.getCursor();
-        cursor.moveToPosition(position);
-        Uri uri = ContactsContract.Contacts.getLookupUri(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID)),
-                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)));
-        Intent intent = new Intent(this, ContactDetailActivity.class);
-        intent.setData(uri);
-        startActivity(intent);
-    }
-
-    private class ContactsAdapter extends CursorAdapter {
-        private final LayoutInflater inflater;
-
-        public ContactsAdapter(Context context) {
-            super(context, null, 0);
-            inflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            final View itemLayout =
-                    inflater.inflate(R.layout.contact_list_item, viewGroup, false);
-
-            final ViewHolder holder = new ViewHolder();
-            holder.contactName = (TextView) itemLayout.findViewById(R.id.contact_name);
-            holder.phone = (TextView) itemLayout.findViewById(R.id.phone);
-            holder.email = (TextView) itemLayout.findViewById(R.id.email);
-            holder.icon = (QuickContactBadge) itemLayout.findViewById(android.R.id.icon);
-
-            itemLayout.setTag(holder);
-
-            return itemLayout;
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cur) {
-            final ViewHolder holder = (ViewHolder) view.getTag();
-            int contactId = cur.getInt(INDEX_CONTACT_ID);
-            String contactName = cur.getString(INDEX_DISPLAY_NAME);
-
-            holder.contactName.setText(contactName);
-            holder.phone.setText(getFromDetailCursor(contactId, curPhone));
-            holder.email.setText(getFromDetailCursor(contactId, curEmail));
-
-            final Uri contactUri = ContactsContract.Contacts.getLookupUri(
-                    cur.getLong(INDEX_CONTACT_ID),
-                    cur.getString(INDEX_LOOKUP_KEY));
-
-            holder.icon.assignContactUri(contactUri);
-
-            String photoThumbnail = cur.getString(INDEX_PHOTO_THUMBNAIL);
-            holder.icon.setImageBitmap(defaultIcon);
-            new AsyncTaskDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[]{holder.icon, photoThumbnail});
-        }
-
-        private Bitmap loadContactPhotoThumbnail(String photoData) {
-            AssetFileDescriptor afd = null;
-            try {
-                Uri thumbUri;
-                thumbUri = Uri.parse(photoData);
-                afd = ContactListActivity.this.getContentResolver().
-                        openAssetFileDescriptor(thumbUri, "r");
-
-                FileDescriptor fileDescriptor = afd.getFileDescriptor();
-                if (fileDescriptor != null) {
-                    return BitmapFactory.decodeFileDescriptor(
-                            fileDescriptor, null, null);
-                }
-            } catch (Exception e) {
-            } finally {
-                if (afd != null) {
-                    try {
-                        afd.close();
-                    } catch (IOException e) {
-                    }
-                }
+        } else {
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            Fragment oldDetail = fm.findFragmentById(R.id.detailFragmentContainer);
+            Fragment newDetail = ContactDetailFragment.newInstance(uri);
+            if (oldDetail != null) {
+                ft.remove(oldDetail);
             }
-            return null;
+            ft.add(R.id.detailFragmentContainer, newDetail);
+            ft.commit();
         }
 
-        private String getFromDetailCursor(int contactId, Cursor cursor) {
-            cursor.moveToFirst();
-            int id = cursor.getInt(INDEX_DETAIL_CONTACT_ID);
-            boolean cursorEnded = false;
-            while (id != contactId) {
-                if (id > contactId) {
-                    cursorEnded = true;
-                    break;
-                }
-                if (!cursor.moveToNext()) {
-                    cursorEnded = true;
-                    break;
-                }
-                id = cursor.getInt(INDEX_DETAIL_CONTACT_ID);
-            }
-            if (cursorEnded) {
-                return "";
-            }
-            return cursor.getString(INDEX_DETAIL_DATA1);
-        }
-
-        private class ViewHolder {
-            TextView contactName;
-            TextView phone;
-            QuickContactBadge icon;
-            public TextView email;
-        }
-
-        private class AsyncTaskDownloader extends AsyncTask<Object, Void, Object> {
-
-            @Override
-            protected Object doInBackground(Object... params) {
-                Bitmap mThumbnail =
-                        loadContactPhotoThumbnail((String) params[1]);
-                return new Object[]{params[0], mThumbnail};
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                Object[] array = (Object[]) o;
-                QuickContactBadge icon = (QuickContactBadge) array[0];
-                Bitmap thumbnailBitmap = (Bitmap) array[1];
-                if (thumbnailBitmap != null) {
-                    icon.setImageBitmap(thumbnailBitmap);
-                }
-            }
-        }
     }
 }

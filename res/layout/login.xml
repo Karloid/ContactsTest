@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login"
             android:id="@+id/loginButton"
-            android:drawableLeft="@drawable/login_button"
+            android:drawableLeft="@drawable/login_button_selector"
             android:paddingLeft="@dimen/login_button_padding"
             android:paddingRight="@dimen/login_button_padding"
             android:enabled="false"/>
