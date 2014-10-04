@@ -1,4 +1,4 @@
-package com.krld.ContactsTest;
+package com.krld.ContactsTest.fragments;
 
 import android.app.ActionBar;
 import android.app.Fragment;
@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import com.krld.ContactsTest.R;
+import com.krld.ContactsTest.activitys.ContactListActivity;
 
 public class LoginFragment extends Fragment {
     private View loginButton;

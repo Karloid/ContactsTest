@@ -1,8 +1,8 @@
-package com.krld.ContactsTest;
+package com.krld.ContactsTest.activitys;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import com.krld.ContactsTest.fragments.ContactDetailFragment;
 
 public class ContactDetailActivity extends SingleFragmentActivity {
     @Override

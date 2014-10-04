@@ -1,12 +1,13 @@
-package com.krld.ContactsTest;
+package com.krld.ContactsTest.activitys;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
+import com.krld.ContactsTest.fragments.ContactDetailFragment;
+import com.krld.ContactsTest.fragments.ContactListFragment;
+import com.krld.ContactsTest.R;
 
 /**
  * Created by Andrey on 9/28/2014.
@@ -14,7 +15,8 @@ import android.os.Bundle;
 public class ContactListActivity extends SingleFragmentActivity implements ContactListFragment.Callbacks {
     @Override
     protected Fragment createFragment() {
-        return new ContactListFragment();
+		Fragment f = ContactListFragment.newInstance();
+		return f;
     }
 
     @Override
@@ -33,6 +35,9 @@ public class ContactListActivity extends SingleFragmentActivity implements Conta
             FragmentTransaction ft = fm.beginTransaction();
             Fragment oldDetail = fm.findFragmentById(R.id.detailFragmentContainer);
             Fragment newDetail = ContactDetailFragment.newInstance(uri);
+			//ft.setCustomAnimations(R.anim.slide_left, R.anim.slide_out_rigth);
+			ft.setCustomAnimations(R.anim.fade_out, R.anim.fade_in);
+			//ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
             if (oldDetail != null) {
                 ft.remove(oldDetail);
             }
@@ -41,4 +46,9 @@ public class ContactListActivity extends SingleFragmentActivity implements Conta
         }
 
     }
+
+	@Override
+	public boolean isMultiPaneActivity() {
+		return findViewById(R.id.detailFragmentContainer) != null;
+	}
 }

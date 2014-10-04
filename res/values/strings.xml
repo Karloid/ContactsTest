@@ -13,4 +13,14 @@
     <string name="logo_content_description">Logo description</string>
     <string name="hint_username">Username</string>
     <string name="hint_password">Password</string>
+    <string-array name="menu_array">
+        <item>Home</item>
+        <item>Messages</item>
+        <item>News</item>
+        <item>Settings</item>
+        <item>Nice tabs</item>
+        <item>Contacts</item>
+    </string-array>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

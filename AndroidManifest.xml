@@ -8,13 +8,14 @@
     <application android:label="@string/app_name" android:icon="@drawable/logo_big"
                  android:allowBackup="true"
                  android:theme="@android:style/Theme.Holo.Light">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activitys.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ContactListActivity" android:launchMode="singleTop" android:label=""/>
-        <activity android:name=".ContactDetailActivity" android:parentActivityName=".ContactListActivity"/>
+        <activity android:name=".activitys.ContactListActivity" android:launchMode="singleTop" android:label=""/>
+        <activity android:name=".activitys.ContactDetailActivity" android:parentActivityName=".activitys.ContactListActivity"/>
+        <activity android:name=".activitys.TabActivity" android:parentActivityName=".activitys.ContactListActivity"/>
     </application>
 </manifest>

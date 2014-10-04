@@ -3,7 +3,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/contact_icon_margin"
-                android:background="@drawable/list_item_selector">
+                android:background="@drawable/list_item_selector"
+                >
 
     <QuickContactBadge android:id="@android:id/icon"
                        android:layout_height="?android:attr/listPreferredItemHeight"
@@ -28,6 +29,7 @@
               android:ellipsize="marquee"
               android:text="Contact name"
               android:textAppearance="?android:attr/textAppearanceLarge"/>
+
     <TextView android:id="@+id/phone"
               style="@style/contactPhoneEmail"
               android:paddingLeft="@dimen/list_view_item_padding"
@@ -42,6 +44,7 @@
               android:ellipsize="marquee"
               android:text="Phone if any"
               android:textAppearance="?android:attr/textAppearanceLarge"/>
+
     <TextView android:id="@+id/email"
               style="@style/contactPhoneEmail"
               android:paddingLeft="@dimen/list_view_item_padding"
@@ -55,8 +58,6 @@
               android:singleLine="true"
               android:ellipsize="marquee"
               android:text="Email if any"
-              android:textAppearance="?android:attr/textAppearanceLarge"/><![CDATA[
-    >
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-]]>
 </RelativeLayout>
