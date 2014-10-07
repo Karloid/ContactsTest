@@ -10,6 +10,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.krld.ContactsTest.R;
@@ -46,7 +48,7 @@ public class TabFragment extends Fragment {
 
 	private void initDefaultsTabs() {
 		mTabs = new ArrayList<ColorTab>();
-		int tabCount = 100;
+		int tabCount = 10;
 		for (int i = 0; i < tabCount; i++) {
 			ColorTab colorTab = new ColorTab(i);
 			mTabs.add(colorTab);
@@ -79,6 +81,20 @@ public class TabFragment extends Fragment {
 			viewHolder.textView = (TextView) view.findViewById(android.R.id.text1);
 			viewHolder.background = (LinearLayout) view.findViewById(android.R.id.background);
 			viewHolder.swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(android.R.id.content);
+			viewHolder.nextButton = (Button) view.findViewById(R.id.next_tab);
+			viewHolder.prevButton = (Button) view.findViewById(R.id.prev_tab);
+			viewHolder.nextButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mViewPager.arrowScroll(ViewPager.FOCUS_RIGHT);
+				}
+			});
+			viewHolder.prevButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mViewPager.arrowScroll(ViewPager.FOCUS_LEFT);
+				}
+			});
 			colorTab.setViewHolder(viewHolder);
 			colorTab.fillViewContent();
 			return view;
@@ -93,6 +109,8 @@ public class TabFragment extends Fragment {
 			public TextView textView;
 			public LinearLayout background;
 			public SwipeRefreshLayout swipeRefreshLayout;
+			public Button nextButton;
+			public Button prevButton;
 		}
 	}
 

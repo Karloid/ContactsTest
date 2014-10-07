@@ -11,13 +11,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@android:id/content">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New Text"
-                style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
-                android:id="@android:id/text1" android:textSize="70sp"
-                android:gravity="center_vertical|center_horizontal"/>
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" android:gravity="center_vertical">
+            <Button
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Prev"
+                    android:id="@+id/prev_tab" android:background="@drawable/nav_button_selector"/>
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
+                    android:id="@android:id/text1" android:textSize="70sp"
+                    android:gravity="center_vertical|center_horizontal" android:text="Tab 0"/>
+            <Button
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Next"
+                    android:id="@+id/next_tab" android:background="@drawable/nav_button_selector"/>
+        </LinearLayout>
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>
