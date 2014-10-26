@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import com.krld.ContactsTest.R;
-import com.krld.ContactsTest.activitys.ContactListActivity;
+import com.krld.ContactsTest.activities.ContactListActivity;
 
 public class LoginFragment extends Fragment {
     private View loginButton;
@@ -21,7 +21,6 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.login, container, false);
-        hideActionBar();
         initViews(v);
         return v;
     }
@@ -48,11 +47,6 @@ public class LoginFragment extends Fragment {
     private void startContactListActivity() {
         Intent intent = new Intent(getActivity(), ContactListActivity.class);
         startActivity(intent);
-    }
-
-    private void hideActionBar() {
-        ActionBar actionBar = getActivity().getActionBar();
-        actionBar.hide();
     }
 
     private void updateLoginButtonState() {
