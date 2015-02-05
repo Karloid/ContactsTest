@@ -5,7 +5,6 @@
         android:id="@+id/my_awesome_toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:paddingTop="25dp"
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         tools:showIn="@layout/activity_onepane"

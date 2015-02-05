@@ -15,7 +15,10 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.TypedValue;
 import android.view.*;
-import android.widget.*;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.QuickContactBadge;
+import android.widget.TextView;
 import com.krld.ContactsTest.R;
 
 import java.io.FileDescriptor;
@@ -102,6 +105,7 @@ public class ContactListFragment extends ListFragment implements LoaderManager.L
 			public void run() {
 				ListView listView = getListView();
 				int firstItem = 0;
+				if (listView.getAdapter().getCount() == 0) return;
 				listView.setSelection(firstItem);
 				listView.performItemClick(listView.getChildAt(firstItem), firstItem, firstItem);
 			}
@@ -173,6 +177,7 @@ public class ContactListFragment extends ListFragment implements LoaderManager.L
 
 	public interface Callbacks {
 		void onContactSelected(Uri uri);
+
 		boolean isMultiPaneActivity();
 	}
 
