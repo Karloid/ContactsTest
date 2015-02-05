@@ -50,7 +50,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void updateLoginButtonState() {
-        loginButton.setEnabled(!userNameEdit.getText().toString().isEmpty() && !passwordEdit.getText().toString().isEmpty());
+        loginButton.setEnabled(true || !userNameEdit.getText().toString().isEmpty() && !passwordEdit.getText().toString().isEmpty());
     }
 
     private class TextChangedListener implements TextWatcher {

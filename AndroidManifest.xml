@@ -15,7 +15,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ContactListActivity" android:launchMode="singleTop" android:label=""/>
-        <activity android:name=".activities.ContactDetailActivity" android:parentActivityName=".activities.ContactListActivity"/>
+        <activity android:name=".activities.ContactDetailActivity"
+                  android:parentActivityName=".activities.ContactListActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activities.ContactListActivity" />
+
+        </activity>
         <activity android:name=".activities.TabActivity" android:parentActivityName=".activities.ContactListActivity"/>
     </application>
 </manifest>

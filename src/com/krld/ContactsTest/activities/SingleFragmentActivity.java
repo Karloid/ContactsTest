@@ -30,8 +30,11 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(getLayoutResourceId());
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
-        setSupportActionBar(toolbar);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+		setSupportActionBar(toolbar);
+		setupNavigation(toolbar);
+
 
 		FragmentManager fm = getFragmentManager();
 		Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
@@ -41,10 +44,10 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
 					.add(R.id.fragmentContainer, fragment)
 					.commit();
 		}
-		setupNavigation();
+
 	}
 
-	protected void setupNavigation() {
+	protected void setupNavigation(Toolbar toolbar) {
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		if (mDrawerLayout == null) return;
 		menuArray = getResources().getStringArray(R.array.menu_array);
@@ -52,12 +55,23 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuArray));
 		mDrawerList.setOnItemClickListener(new OnMenuItemClickListener());
 		mDrawerToggle = new ActionBarDrawerToggle(this,
-				mDrawerLayout,
+				mDrawerLayout, toolbar,
 				R.string.drawer_open,
 				R.string.drawer_close);
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		mDrawerToggle.setDrawerIndicatorEnabled(thisMainActivity());
+		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+		mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
+	}
+
+	private boolean thisMainActivity() {
+		return this instanceof ContactListActivity;
 	}
 
 	protected int getLayoutResourceId() {
@@ -68,9 +82,7 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Pass the event to ActionBarDrawerToggle, if it returns
-		// true, then it has handled the app icon touch event
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
+		if (mDrawerToggle.onOptionsItemSelected(item)) {  // ???
 			return true;
 		}
 		// Handle your other action bar items...
